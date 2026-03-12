@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+
+{% block page_title %}Leave Management{% endblock %}
+{% block page_subtitle %}Review and process employee leave requests.{% endblock %}
+
+{% block content %}
+<!-- Pending Requests Section -->
+<div class="glass-card animate-fade-in" style="margin-bottom: 3rem; border-top: 4px solid var(--warning);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); display: flex; align-items: center; justify-content: center; color: var(--warning);">
+                <i class="ph ph-clock-countdown" style="font-size: 1.5rem;"></i>
+            </div>
+            <h2>Pending Requests</h2>
+        </div>
+        <span class="badge badge-warning">{{ pending_leaves|length }} Requests</span>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Dates</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in pending_leaves %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--glass-glow); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: var(--primary-light);">
+                                {{ leave.employee.full_name[:2].upper() }}
+                            </div>
+                            <span style="font-weight: 600;">{{ leave.employee.full_name }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+                            <i class="ph ph-calendar" style="color: var(--text-muted);"></i>
+                            {{ leave.start_date.strftime('%d %b') }} - {{ leave.end_date.strftime('%d %b %Y') }}
+                        </div>
+                    </td>
+                    <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-secondary);">
+                        {{ leave.reason }}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <form action="{{ url_for('admin.approve_leave', id=leave.id) }}" method="POST">
+                                <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem; background: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+                                    <i class="ph ph-check"></i> Approve
+                                </button>
+                            </form>
+                            <form action="{{ url_for('admin.reject_leave', id=leave.id) }}" method="POST">
+                                <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                                    <i class="ph ph-x"></i> Reject
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <i class="ph ph-calendar-blank" style="font-size: 3rem; margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
+                        All caught up! No pending leave requests.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- History Section -->
+<div class="glass-card animate-fade-in">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+            <i class="ph ph-history" style="font-size: 1.5rem;"></i>
+        </div>
+        <h2>Recent Leave History</h2>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Dates</th>
+                    <th>Status</th>
+                    <th>Date Applied</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in all_leaves %}
+                    {% if leave.status != 'Pending' %}
+                    <tr>
+                        <td>{{ leave.employee.full_name }}</td>
+                        <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                        <td>
+                            <span class="badge {{ 'badge-success' if leave.status == 'Approved' else 'badge-danger' }}">
+                                {{ leave.status }}
+                            </span>
+                        </td>
+                        <td style="color: var(--text-muted);">{{ leave.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endif %}
+                {% else %}
+                <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No history records.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

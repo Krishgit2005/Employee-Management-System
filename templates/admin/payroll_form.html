@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block page_title %}Process Payroll{% endblock %}
+{% block page_subtitle %}Generate a salary slip for {{ user.full_name }}.{% endblock %}
+
+{% block content %}
+<div class="glass-card animate-fade-in" style="max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border);">
+        <div style="width: 54px; height: 54px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; color: var(--success);">
+            <i class="ph ph-bank" style="font-size: 1.75rem;"></i>
+        </div>
+        <div>
+            <h2 style="margin-bottom: 0.25rem;">Payroll Processing</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">{{ user.position }} | Base: ${{ "%.2f"|format(user.base_salary) }}</p>
+        </div>
+    </div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="month">Salary Month</label>
+            <input type="month" class="form-control" id="month" name="month" required>
+        </div>
+
+        <div class="form-group">
+            <label for="deductions">Deductions (Tax, Insurance, Unpaid Leaves)</label>
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);">$</span>
+                <input type="number" step="0.01" class="form-control" style="padding-left: 2.25rem;" id="deductions" name="deductions" value="0.00">
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Net pay will be automatically calculated as Base - Deductions.</p>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 3rem; justify-content: flex-end;">
+            <a href="{{ url_for('admin.analysis', id=user.id) }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary" style="background: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+                <i class="ph ph-receipt"></i> Generate Slip
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+{% block page_title %}My Dashboard{% endblock %}
+{% block page_subtitle %}Personal performance and records overview.{% endblock %}
+
+{% block header_actions %}
+<form action="{{ url_for('employee.mark_attendance') }}" method="POST">
+    <button type="submit" class="btn btn-primary">
+        <i class="ph ph-fingerprint"></i>
+        Mark Attendance Today
+    </button>
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="glass-card stat-card">
+        <div class="stat-icon">
+            <i class="ph ph-calendar-check"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Days Present</h3>
+            <div class="stat-value">{{ total_present }}</div>
+        </div>
+    </div>
+    <div class="glass-card stat-card">
+        <div class="stat-icon" style="color: var(--success); background: rgba(16, 185, 129, 0.1);">
+            <i class="ph ph-wallet"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Base Salary</h3>
+            <div class="stat-value">${{ "%.2f"|format(current_user.base_salary) }}</div>
+        </div>
+    </div>
+    <div class="glass-card stat-card">
+        <div class="stat-icon" style="color: var(--info); background: rgba(59, 130, 246, 0.1);">
+            <i class="ph ph-briefcase"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Position</h3>
+            <div class="stat-value" style="font-size: 1.25rem;">{{ current_user.position }}</div>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <!-- Attendance Section -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2>Recent Attendance</h2>
+            <i class="ph ph-clock-counter-clockwise" style="color: var(--text-muted);"></i>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendances %}
+                    <tr>
+                        <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <span class="badge {{ 'badge-success' if record.status == 'Present' else 'badge-warning' if record.status == 'Leave' else 'badge-danger' }}">
+                                {{ record.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="2" style="text-align: center; color: var(--text-muted); padding: 2rem;">No logs found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Salary Section -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2>Recent Salary Slips</h2>
+            <i class="ph ph-file-text" style="color: var(--text-muted);"></i>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Net Paid</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in salaries %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ record.month }}</td>
+                        <td style="color: var(--success); font-weight: 700;">${{ "%.2f"|format(record.amount_paid) }}</td>
+                        <td>
+                            <a href="{{ url_for('employee.view_salary_slip', id=record.id) }}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">
+                                <i class="ph ph-receipt"></i> Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 2rem;">No slips available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

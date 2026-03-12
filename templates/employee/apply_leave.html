@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block page_title %}Apply for Leave{% endblock %}
+{% block page_subtitle %}Submit a new leave request for approval.{% endblock %}
+
+{% block content %}
+<div class="glass-card animate-fade-in" style="max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border);">
+        <div style="width: 54px; height: 54px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; color: var(--info);">
+            <i class="ph ph-calendar-plus" style="font-size: 1.75rem;"></i>
+        </div>
+        <div>
+            <h2 style="margin-bottom: 0.25rem;">New Leave Request</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Your request will be sent to admin for approval.</p>
+        </div>
+    </div>
+
+    <form method="POST">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="form-group">
+                <label for="start_date">Start Date</label>
+                <div style="position: relative;">
+                    <i class="ph ph-calendar-blank" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="date" class="form-control" style="padding-left: 2.75rem;" id="start_date" name="start_date" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="end_date">End Date</label>
+                <div style="position: relative;">
+                    <i class="ph ph-calendar-blank" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="date" class="form-control" style="padding-left: 2.75rem;" id="end_date" name="end_date" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+            <label for="reason">Reason for Leave</label>
+            <textarea class="form-control" id="reason" name="reason" rows="4" required placeholder="Briefly explain why you need time off..."></textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 3rem; justify-content: flex-end;">
+            <a href="{{ url_for('employee.view_leaves') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="ph ph-paper-plane-right"></i> Submit Request
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

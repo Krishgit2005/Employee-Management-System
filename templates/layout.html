@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traction | EMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+                    <i class="ph ph-hexagon-fill" style="font-size: 2.5rem; color: var(--primary);"></i>
+                    <span style="font-size: 1.5rem; font-weight: 800; letter-spacing: -1px;" class="gradient-text">Traction</span>
+                </div>
+            </div>
+            
+            <nav class="nav-list">
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="nav-item {{ 'active' if request.endpoint == 'admin.dashboard' }}">
+                        <i class="ph ph-squares-four"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('admin.attendance_report') }}" class="nav-item {{ 'active' if request.endpoint == 'admin.attendance_report' }}">
+                        <i class="ph ph-calendar-check"></i>
+                        <span>Attendance</span>
+                    </a>
+                    <a href="{{ url_for('admin.add_employee') }}" class="nav-item {{ 'active' if request.endpoint == 'admin.add_employee' }}">
+                        <i class="ph ph-user-plus"></i>
+                        <span>Add Employee</span>
+                    </a>
+                    <a href="{{ url_for('admin.manage_leaves') }}" class="nav-item {{ 'active' if request.endpoint == 'admin.manage_leaves' }}">
+                        <i class="ph ph-calendar-check"></i>
+                        <span>Manage Leaves</span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('employee.dashboard') }}" class="nav-item {{ 'active' if request.endpoint == 'employee.dashboard' }}">
+                        <i class="ph ph-house"></i>
+                        <span>My Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('employee.view_leaves') }}" class="nav-item {{ 'active' if request.endpoint == 'employee.view_leaves' }}">
+                        <i class="ph ph-briefcase"></i>
+                        <span>My Leaves</span>
+                    </a>
+                {% endif %}
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="{{ url_for('profile') }}" class="user-profile" style="text-decoration: none; color: inherit;">
+                    <div class="avatar">
+                        {{ current_user.full_name[:2].upper() }}
+                    </div>
+                    <div class="user-details">
+                        <p class="user-name">{{ current_user.full_name }}</p>
+                        <p class="user-role">{{ current_user.role | capitalize }}</p>
+                    </div>
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-block" style="width: 100%;">
+                    <i class="ph ph-sign-out"></i>
+                    Logout
+                </a>
+            </div>
+        </aside>
+        
+        <main class="main-wrap animate-fade-in">
+            <header class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 class="gradient-text">{% block page_title %}{% endblock %}</h1>
+                    <p style="color: var(--text-secondary)">{% block page_subtitle %}Management Portal Overview{% endblock %}</p>
+                </div>
+                {% block header_actions %}{% endblock %}
+            </header>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="msg-alert {{ category }}">
+                            <div class="msg-content">
+                                <i class="ph {{ 'ph-check-circle' if category == 'success' else 'ph-warning-circle' }} msg-icon" style="color: {{ 'var(--success)' if category == 'success' else 'var(--danger)' }};"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

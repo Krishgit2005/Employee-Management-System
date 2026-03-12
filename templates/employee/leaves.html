@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+
+{% block page_title %}My Leave Requests{% endblock %}
+{% block page_subtitle %}Track the status of your submitted leave requests.{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('employee.apply_leave') }}" class="btn btn-primary">
+    <i class="ph ph-plus"></i> Apply for Leave
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="glass-card animate-fade-in">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+            <i class="ph ph-briefcase" style="font-size: 1.5rem;"></i>
+        </div>
+        <h2>Leave History</h2>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Duration</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Applied On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in leaves %}
+                <tr>
+                    <td>
+                        <div style="font-weight: 600; color: var(--text-primary);">
+                            {{ leave.start_date.strftime('%d %b %Y') }} - {{ leave.end_date.strftime('%d %b %Y') }}
+                        </div>
+                    </td>
+                    <td style="color: var(--text-secondary); max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ leave.reason }}
+                    </td>
+                    <td>
+                        <span class="badge {{ 'badge-success' if leave.status == 'Approved' else 'badge-danger' if leave.status == 'Rejected' else 'badge-warning' }}">
+                            {{ leave.status }}
+                        </span>
+                    </td>
+                    <td style="color: var(--text-muted); font-size: 0.9rem;">
+                        {{ leave.created_at.strftime('%Y-%m-%d') }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <i class="ph ph-folder-open" style="font-size: 3rem; margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
+                        No leave requests found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block page_title %}Salary Slip: {{ salary.month }}{% endblock %}
+{% block page_subtitle %}Monthly payroll breakdown and payment confirmation.{% endblock %}
+
+{% block header_actions %}
+<button onclick="window.print()" class="btn btn-secondary">
+    <i class="ph ph-printer"></i> Print Slip
+</button>
+{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        .sidebar, .main-header, .header-actions { display: none !important; }
+        .content { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        .glass-card { border: 1px solid #ddd !important; box-shadow: none !important; backdrop-filter: none !important; background: white !important; color: black !important; }
+        .badge { border: 1px solid #000 !important; color: black !important; }
+        body { background: white !important; color: black !important; }
+    }
+</style>
+
+<div class="glass-card animate-fade-in" style="max-width: 800px; margin: 0 auto; padding: 3rem;">
+    <!-- Slip Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4rem; border-bottom: 2px solid var(--glass-border); padding-bottom: 2rem;">
+        <div>
+            <h1 style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary-light);">PAYSLIP</h1>
+            <p style="color: var(--text-muted); font-weight: 600;">{{ salary.month }}</p>
+        </div>
+        <div style="text-align: right;">
+            <h2 style="font-size: 1.25rem; font-weight: 700;">EMS Premium</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Enterprise Management System</p>
+        </div>
+    </div>
+
+    <!-- Employee Info -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-bottom: 4rem;">
+        <div>
+            <p style="text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 0.5rem;">Employee Details</p>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">{{ current_user.full_name }}</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">{{ current_user.position }}</p>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">{{ current_user.department }}</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 0.5rem;">Payment Reference</p>
+            <p style="font-family: monospace; font-size: 1rem; color: var(--primary-light);">REF-{{ salary.id }}-{{ salary.month.replace('-', '') }}</p>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">Generated on: {{ salary.created_at.strftime('%d %b %Y') }}</p>
+        </div>
+    </div>
+
+    <!-- Calculations -->
+    <div style="margin-bottom: 4rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--glass-border);">
+                    <th style="text-align: left; padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Description</th>
+                    <th style="text-align: right; padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 1.5rem 0; font-weight: 500;">Basic Salary</td>
+                    <td style="text-align: right; padding: 1.5rem 0; font-weight: 500;">${{ "%.2f"|format(current_user.base_salary) }}</td>
+                </tr>
+                <tr style="color: var(--danger);">
+                    <td style="padding: 1rem 0;">Deductions (Absence/Misc)</td>
+                    <td style="text-align: right; padding: 1rem 0;">-${{ "%.2f"|format(salary.deductions) }}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr style="border-top: 2px solid var(--primary); background: rgba(99, 102, 241, 0.05);">
+                    <td style="padding: 1.5rem 1rem; font-size: 1.1rem; font-weight: 700;">Net Payable</td>
+                    <td style="text-align: right; padding: 1.5rem 1rem; font-size: 1.25rem; font-weight: 800; color: var(--success);">${{ "%.2f"|format(salary.amount_paid) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Footer Note -->
+    <div style="text-align: center; border-top: 1px dashed var(--glass-border); padding-top: 2rem; color: var(--text-muted); font-size: 0.85rem;">
+        <p>This is a computer-generated salary slip and does not require a physical signature.</p>
+        <p style="margin-top: 0.5rem;">In case of any discrepancy, please contact the HR department.</p>
+    </div>
+</div>
+{% endblock %}
