@@ -42,6 +42,10 @@
                 <label>Department</label>
                 <input type="text" class="form-control" value="{{ current_user.department }}" disabled style="opacity: 0.6;">
             </div>
+            <div class="form-group" style="grid-column: span 2; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                <label>Change Password <span style="font-size: 0.8rem; color: var(--text-muted);">(Leave blank to keep current)</span></label>
+                <input type="password" name="new_password" class="form-control" placeholder="New Password">
+            </div>
         </div>
 
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">

@@ -1,7 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, Response
 from flask_login import login_required
 from models import db, User, Attendance, Salary, LeaveRequest
 from routes.decorators import admin_required
+import csv
+from io import StringIO
+from collections import Counter
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -12,7 +15,35 @@ def dashboard():
     users = User.query.filter_by(role='employee').all()
     emp_count = len(users)
     pending_leaves = LeaveRequest.query.filter_by(status='Pending').count()
-    return render_template('admin/dashboard.html', users=users, emp_count=emp_count, pending_leaves=pending_leaves)
+    
+    # Analytics data
+    departments = [u.department for u in users if u.department]
+    dept_counts = dict(Counter(departments))
+    
+    leaves = LeaveRequest.query.all()
+    leave_counts = dict(Counter([l.status for l in leaves]))
+    
+    return render_template('admin/dashboard.html', users=users, emp_count=emp_count, pending_leaves=pending_leaves, dept_counts=dept_counts, leave_counts=leave_counts)
+
+@bp.route('/export/employees')
+@login_required
+@admin_required
+def export_employees():
+    users = User.query.filter_by(role='employee').all()
+    
+    si = StringIO()
+    writer = csv.writer(si)
+    writer.writerow(['ID', 'Username', 'Full Name', 'Email', 'Department', 'Position', 'Base Salary'])
+    
+    for user in users:
+        writer.writerow([user.id, user.username, user.full_name, user.email, user.department, user.position, user.base_salary])
+        
+    output = si.getvalue()
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=employees_export.csv"}
+    )
 
 @bp.route('/attendance')
 @login_required

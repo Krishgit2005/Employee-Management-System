@@ -4,13 +4,20 @@
 {% block page_subtitle %}Overview of company personnel and metrics.{% endblock %}
 
 {% block header_actions %}
-<a href="{{ url_for('admin.add_employee') }}" class="btn btn-primary">
-    <i class="ph ph-plus"></i>
-    Add Employee
-</a>
+<div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('admin.export_employees') }}" class="btn btn-secondary">
+        <i class="ph ph-download-simple"></i>
+        Export CSV
+    </a>
+    <a href="{{ url_for('admin.add_employee') }}" class="btn btn-primary">
+        <i class="ph ph-plus"></i>
+        Add Employee
+    </a>
+</div>
 {% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="stats-grid">
     <div class="glass-card stat-card">
         <div class="stat-icon">
@@ -37,6 +44,18 @@
         <div class="stat-info">
             <h3>Pending Leaves</h3>
             <div class="stat-value">0</div> <!-- Placeholder for now -->
+        </div>
+    </div>
+</div>
+
+<div class="glass-card" style="margin-bottom: 2rem;">
+    <h2 style="margin-bottom: 1rem;">Analytics Overview</h2>
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1rem;">
+            <canvas id="deptChart"></canvas>
+        </div>
+        <div style="flex: 1; min-width: 300px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1rem;">
+            <canvas id="leaveChart"></canvas>
         </div>
     </div>
 </div>
@@ -100,4 +119,53 @@
         </table>
     </div>
 </div>
+
+<script>
+    const deptCtx = document.getElementById('deptChart').getContext('2d');
+    const deptData = {{ dept_counts | tojson }};
+    new Chart(deptCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(deptData),
+            datasets: [{
+                data: Object.values(deptData),
+                backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#fff' } },
+                title: { display: true, text: 'Department Distribution', color: '#fff' }
+            }
+        }
+    });
+
+    const leaveCtx = document.getElementById('leaveChart').getContext('2d');
+    const leaveData = {{ leave_counts | tojson }};
+    new Chart(leaveCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(leaveData),
+            datasets: [{
+                label: 'Leave Requests',
+                data: Object.values(leaveData),
+                backgroundColor: ['#f59e0b', '#10b981', '#ef4444'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                x: { ticks: { color: '#fff' }, grid: { display: false } }
+            },
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Leave Request Statuses', color: '#fff' }
+            }
+        }
+    });
+</script>
 {% endblock %}

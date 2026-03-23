@@ -68,7 +68,10 @@ def apply_leave():
             end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
             reason = request.form['reason']
             
-            if start_date > end_date:
+            today = datetime.utcnow().date()
+            if start_date < today:
+                flash('Leave start date cannot be in the past.', 'error')
+            elif start_date > end_date:
                 flash('Start date cannot be after end date.', 'error')
             else:
                 new_leave = LeaveRequest(

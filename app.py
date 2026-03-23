@@ -62,6 +62,11 @@ def profile():
         try:
             current_user.full_name = request.form['full_name']
             current_user.email = request.form['email']
+            
+            new_password = request.form.get('new_password')
+            if new_password and len(new_password.strip()) > 0:
+                current_user.set_password(new_password)
+                
             db.session.commit()
             flash('Profile updated successfully!', 'success')
         except Exception as e:
